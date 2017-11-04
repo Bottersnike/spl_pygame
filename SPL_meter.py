@@ -2,19 +2,22 @@ import threading
 import struct
 import math
 import os
-os.environ['SDL_VIDEODRIVER'] = 'fbcon'
-os.environ['SDL_FBDEV'] = '/dev/fb1'
-os.environ['SDL_MOUSEDRV'] = 'TSLIB'
-os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
 
 import scipy.signal
 import numpy as np
 import pyaudio
 import pygame
+
+
+RPI = False
+LINE_IN = True
+
+if RPI:
+    os.environ['SDL_VIDEODRIVER'] = 'fbcon'
+    os.environ['SDL_FBDEV'] = '/dev/fb1'
+    os.environ['SDL_MOUSEDRV'] = 'TSLIB'
+    os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
 pygame.init()
-
-
-RPI = True
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -123,6 +126,7 @@ class Meter:
 
         self.samples_1 = []
         self.samples_2 = []
+
         self.graph_samples_1 = []
         self.graph_samples_2 = []
 
@@ -156,22 +160,24 @@ class Meter:
             frames_per_buffer=CHUNK,
             input_device_index=1 if RPI else 2,
         )
-        self.stream2 = None  # self.audio.open(
-        #    format=FORMAT,
-        #    channels=CHANNELS,
-        #    rate=RATE,
-        #    input=True,
-        #    frames_per_buffer=CHUNK,
-        #    input_device_index=1,
-        #)
+        if LINE_IN:
+            self.stream2 = self.audio.open(
+                format=FORMAT,
+                channels=CHANNELS,
+                rate=RATE,
+                input=True,
+                frames_per_buffer=CHUNK,
+                input_device_index=1,
+            )
 
         thread = threading.Thread(target=self.read_stream1)
         thread.daemon = True
         thread.start()
 
-        thread = threading.Thread(target=self.read_stream2)
-        thread.daemon = True
-        thread.start()
+        if LINE_IN:
+            thread = threading.Thread(target=self.read_stream2)
+            thread.daemon = True
+            thread.start()
 
         self.clock = pygame.time.Clock()
 
@@ -322,28 +328,43 @@ class Meter:
         cross_bar(self.quiet)
         cross_bar(self.loud)
 
-        pygame.draw.line(self.screen, BORDER_COLOUR, (sw / 4, sh / 2 - 1), (sw / 4 * 3, sh / 2 - 1))
         if not self.show_graph:
-            # Coloured area 1:
-            pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
-            t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
-            self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
-            # Coloured area 2:
-            pygame.draw.rect(self.screen, self.a2_colour, (sw / 4 + COLOUR_PADDING, sh / 2 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 1 - COLOUR_PADDING * 2))
-            t = FONT_BIG.render(SOURCE_2_LABEL, 1, FG_COLOUR)
-            self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, sh / 2 + COLOUR_PADDING + 3))
-        else:
-            # Coloured area 1:
-            pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 4 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
-            t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
-            self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
-            # Coloured area 2:
-            pygame.draw.rect(self.screen, self.a2_colour, (sw / 2 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 4 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
-            t = FONT_BIG.render(SOURCE_2_LABEL, 1, FG_COLOUR)
-            self.screen.blit(t, (sw / 2 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
+            if LINE_IN:
+                pygame.draw.line(self.screen, BORDER_COLOUR, (sw / 4, sh / 2 - 1), (sw / 4 * 3, sh / 2 - 1))
 
-            # Verticle divider
-            pygame.draw.line(self.screen, BORDER_COLOUR, (sw / 2 - 1, 1), (sw / 2 - 1, sh / 2 - 1))
+                # Coloured area 1:
+                pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
+                # Coloured area 2:
+                pygame.draw.rect(self.screen, self.a2_colour, (sw / 4 + COLOUR_PADDING, sh / 2 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 1 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_2_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, sh / 2 + COLOUR_PADDING + 3))
+            else:
+                # Coloured area 1:
+                pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh - 2 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
+        else:
+            pygame.draw.line(self.screen, BORDER_COLOUR, (sw / 4, sh / 2 - 1), (sw / 4 * 3, sh / 2 - 1))
+
+            if LINE_IN:
+                # Coloured area 1:
+                pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 4 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
+                # Coloured area 2:
+                pygame.draw.rect(self.screen, self.a2_colour, (sw / 2 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 4 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_2_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 2 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
+
+                # Verticle divider
+                pygame.draw.line(self.screen, BORDER_COLOUR, (sw / 2 - 1, 1), (sw / 2 - 1, sh / 2 - 1))
+            else:
+                # Coloured area 1:
+                pygame.draw.rect(self.screen, self.a1_colour, (sw / 4 + COLOUR_PADDING, 1 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 2 - COLOUR_PADDING * 2))
+                t = FONT_BIG.render(SOURCE_1_LABEL, 1, FG_COLOUR)
+                self.screen.blit(t, (sw / 4 + COLOUR_PADDING + 3, 1 + COLOUR_PADDING + 3))
 
             # Draw 'dat graph
             rect = pygame.Rect(sw / 4 + COLOUR_PADDING, sh / 2 + COLOUR_PADDING, sw / 2 - COLOUR_PADDING * 2, sh / 2 - 1 - COLOUR_PADDING * 2)
@@ -363,25 +384,27 @@ class Meter:
                 self.screen.set_at((xp, yp), TEXT_COLOUR)
                 lp = (xp, yp)
 
-            lp = None
-            for x, y in enumerate(self.graph_samples_2):
-                xp = x * dx + rect.x
-                yp = y * dy + rect.y
-                xp, yp = int(xp), int(yp)
+            if LINE_IN:
+                lp = None
+                for x, y in enumerate(self.graph_samples_2):
+                    xp = x * dx + rect.x
+                    yp = y * dy + rect.y
+                    xp, yp = int(xp), int(yp)
 
-                if lp is not None:
-                    pygame.draw.aaline(self.screen, TEXT_COLOUR, lp, (xp, yp), True)
+                    if lp is not None:
+                        pygame.draw.aaline(self.screen, TEXT_COLOUR, lp, (xp, yp), True)
 
-                self.screen.set_at((xp, yp), TEXT_COLOUR)
-                lp = (xp, yp)
+                    self.screen.set_at((xp, yp), TEXT_COLOUR)
+                    lp = (xp, yp)
 
         # "Round" everything off :P
         self.screen.set_at((int(sw / 4) + COLOUR_PADDING, 1 + COLOUR_PADDING), BG_COLOUR)
         self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, 1 + COLOUR_PADDING), BG_COLOUR)
-        self.screen.set_at((int(sw / 4) + COLOUR_PADDING, 1 + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 3), BG_COLOUR)
-        self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, 1 + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 3), BG_COLOUR)
+        if LINE_IN or self.show_graph:
+            self.screen.set_at((int(sw / 4) + COLOUR_PADDING, 1 + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 3), BG_COLOUR)
+            self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, 1 + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 3), BG_COLOUR)
 
-        if self.show_graph:
+        if self.show_graph and LINE_IN:
             self.screen.set_at((int(sw / 2) - COLOUR_PADDING - 1, 1 + COLOUR_PADDING), BG_COLOUR)
             self.screen.set_at((int(sw / 2) - COLOUR_PADDING - 1, int(sh / 2) - 2 - COLOUR_PADDING), BG_COLOUR)
             self.screen.set_at((int(sw / 2) + COLOUR_PADDING, 1 + COLOUR_PADDING), BG_COLOUR)
@@ -392,8 +415,9 @@ class Meter:
             self.screen.set_at((int(sw / 2) - 2, int(sh / 2) - 2), BORDER_COLOUR)
             self.screen.set_at((int(sw / 2), int(sh / 2) - 2), BORDER_COLOUR)
 
-        self.screen.set_at((int(sw / 4) + COLOUR_PADDING, int(sh / 2)  + COLOUR_PADDING), BG_COLOUR)
-        self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, int(sh / 2) + COLOUR_PADDING), BG_COLOUR)
+        if LINE_IN or self.show_graph:
+            self.screen.set_at((int(sw / 4) + COLOUR_PADDING, int(sh / 2)  + COLOUR_PADDING), BG_COLOUR)
+            self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, int(sh / 2) + COLOUR_PADDING), BG_COLOUR)
         self.screen.set_at((int(sw / 4) + COLOUR_PADDING, int(sh / 2) + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 2), BG_COLOUR)
         self.screen.set_at((int(sw / 4) + COLOUR_PADDING + int(sw / 2) - COLOUR_PADDING * 2 - 1, int(sh / 2) + COLOUR_PADDING + int(sh / 2) - COLOUR_PADDING * 2 - 2), BG_COLOUR)
 
@@ -405,10 +429,11 @@ class Meter:
         self.screen.set_at((int(sw / 4), sh - 2), BORDER_COLOUR)
         self.screen.set_at((int(sw / 4) * 3 - 1, sh - 2), BORDER_COLOUR)
         self.screen.set_at((int(sw / 4) * 3 + 1, sh - 2), BORDER_COLOUR)
-        self.screen.set_at((int(sw / 4), int(sh / 2)), BORDER_COLOUR)
-        self.screen.set_at((int(sw / 4), int(sh / 2) - 2), BORDER_COLOUR)
-        self.screen.set_at((int(sw / 4) * 3 - 1, int(sh / 2)), BORDER_COLOUR)
-        self.screen.set_at((int(sw / 4) * 3 - 1, int(sh / 2) - 2), BORDER_COLOUR)
+        if LINE_IN or self.show_graph:
+            self.screen.set_at((int(sw / 4), int(sh / 2)), BORDER_COLOUR)
+            self.screen.set_at((int(sw / 4), int(sh / 2) - 2), BORDER_COLOUR)
+            self.screen.set_at((int(sw / 4) * 3 - 1, int(sh / 2)), BORDER_COLOUR)
+            self.screen.set_at((int(sw / 4) * 3 - 1, int(sh / 2) - 2), BORDER_COLOUR)
 
         pygame.display.flip()
 
@@ -473,7 +498,6 @@ class Meter:
                 self.a1_colour = GREEN
 
     def read_stream2(self):
-        return
         while self.running:
             v = self.read(self.stream2)
             self.samples_2.append(v)
