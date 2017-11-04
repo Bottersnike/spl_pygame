@@ -93,7 +93,7 @@ class Meter:
     B, A = A_weighting(RATE)
 
     QUIET_MUSIC = 18
-    LOUD_MUSIC = 6
+    LOUD_MUSIC = 3
 
     QUIET_SPEECH = 36
     LOUD_SPEECH = 12
