@@ -113,7 +113,7 @@ class Meter:
     AM/PM TOGGLE
     '''
     def __init__(self):
-        self.screen = pygame.display.set_mode((320, 240))
+        self.screen = pygame.display.set_mode((320, 240), 0, 32)
         if RPI: pygame.mouse.set_visible(False)
 
         self.running = True
