@@ -92,7 +92,7 @@ def A_weighting(fs):
 class Meter:
     B, A = A_weighting(RATE)
 
-    QUIET_MUSIC = 24
+    QUIET_MUSIC = 18
     LOUD_MUSIC = 6
 
     QUIET_SPEECH = 36
