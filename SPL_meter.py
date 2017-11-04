@@ -2,10 +2,10 @@ import threading
 import struct
 import math
 import os
-#os.environ['SDL_VIDEODRIVER'] = 'fbcon'
-#os.environ['SDL_FBDEV'] = '/dev/fb1'
-#os.environ['SDL_MOUSEDRV'] = 'TSLIB'
-#os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
+os.environ['SDL_VIDEODRIVER'] = 'fbcon'
+os.environ['SDL_FBDEV'] = '/dev/fb1'
+os.environ['SDL_MOUSEDRV'] = 'TSLIB'
+os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
 
 import scipy.signal
 import numpy as np
@@ -14,7 +14,7 @@ import pygame
 pygame.init()
 
 
-RPI = False
+RPI = True
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
