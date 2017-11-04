@@ -9,6 +9,8 @@ import pyaudio
 import pygame
 
 
+LOG_FILE = open('audio.dat', 'a')
+
 RPI = True
 LINE_IN = False
 
@@ -92,10 +94,10 @@ def A_weighting(fs):
 class Meter:
     B, A = A_weighting(RATE)
 
-    QUIET_MUSIC = 18
+    QUIET_MUSIC = 15
     LOUD_MUSIC = 3
 
-    QUIET_SPEECH = 36
+    QUIET_SPEECH = 30
     LOUD_SPEECH = 12
 
     '''
@@ -507,6 +509,7 @@ class Meter:
             if len(self.graph_samples_2) > GRAPH_SAMPLES:
                 self.graph_samples_2.pop(0)
             self.vu_2 = sum(self.samples_2) / len(self.samples_2)
+            LOG_FILE.write(str(v) + '\n')
 
             if self.vu_2 >= self.quiet:
                 self.a2_colour = ORANGE
