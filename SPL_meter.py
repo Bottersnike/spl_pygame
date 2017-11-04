@@ -9,8 +9,8 @@ import pyaudio
 import pygame
 
 
-RPI = False
-LINE_IN = True
+RPI = True
+LINE_IN = False
 
 if RPI:
     os.environ['SDL_VIDEODRIVER'] = 'fbcon'
