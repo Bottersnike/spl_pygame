@@ -174,7 +174,7 @@ class Meter:
         vu_y = (sh - vu_height) / 2
 
         pygame.draw.line(self.screen, BORDER_LIGHT, (vu_x, vu_y + vu_height - 1), (vu_x + vu_width - 1, vu_y + vu_height - 1))
-        pygame.draw.line(self.screen, TEXT_COLOUR, (vu_x + vu_width, vu_y), (vu_x + vu_width, vu_y + vu_height - 1))
+        pygame.draw.line(self.screen, TEXT_COLOUR, (math.floor(vu_x + vu_width - 1), vu_y), (math.floor(vu_x + vu_width - 1), vu_y + vu_height - 1))
 
         for i in range(13):
             x1 = vu_x - 4
@@ -193,8 +193,11 @@ class Meter:
         pygame.draw.rect(self.screen, DARK_BLUE, (vu_x + 1, vu_y + 1, vu_width - 2, vu_height - 3))
         pygame.draw.rect(self.screen, BORDER_COLOUR, (vu_x + vu_width / 2 - 1, vu_y + 1, 1, vu_height - 3))
 
-        def draw_bar(vu, vua, xoff):
-            width = math.ceil((vu_width - 1) / 2 - 1)
+        def draw_bar(vu, vua, xoff, d=0):
+            if d:
+                width = math.ceil((vu_width - 1) / 2 - 1)
+            else:
+                width = math.floor((vu_width - 1) / 2 - 1)
             xp = vu_x + xoff + 1
 
             if vu < 18:
@@ -236,7 +239,7 @@ class Meter:
             pygame.draw.rect(self.screen, TEXT_COLOUR, (vu_x + 1, h, vu_width - 2, 1))
 
         vu = 48 if not self.samples[0] else self.samples[0][-1]
-        draw_bar(vu, self.vus[0], 0)
+        draw_bar(vu, self.vus[0], 0, 1)
 
         vu = 48 if not self.samples[1] else self.samples[1][-1]
         draw_bar(vu, self.vus[1], (vu_width - 1) / 2)
