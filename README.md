@@ -1,5 +1,7 @@
 # Sound Level Meter using Python
 
+![All modes enabled][all]
+
 ## What _is_ this?
 This is a simple script that is designed to run on a Raspberry Pi which will
 take up to two inputs and monitor their volumes, giving visual feedback to the
@@ -73,6 +75,8 @@ The button labled `A/W` will toggle A-weighting on the audio input being
 received from the mic. This can be useful for getting a more accurate picture of
 the audio level. It is not recommended to use this with `SPLIT` enabled.
 
+![A-weighted speech][aw-speech]
+
 ### `SPEECH`
 `SPEECH` mode will lower the thresholds to a second set defined in `config.py`.
 This is useful as speech is almost always quieter than music and as such the
@@ -90,3 +94,9 @@ emulates a second input.
 When the `GRAPH` button is enabled, a graph will be displayed on the lower half
 of the display showing the volume over a past amount of time that can be
 configured in `config.py` (200 samples by default).
+
+![Graph and speech modes][graph-split]
+
+[all]: https://github.com/Bottersnike/spl_pygame/raw/master/img/all.png
+[aw-speech]: https://github.com/Bottersnike/spl_pygame/raw/master/img/aw_speech.png
+[graph-split]: https://github.com/Bottersnike/spl_pygame/raw/master/img/graph_split.png
