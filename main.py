@@ -30,11 +30,11 @@ def A_weighting(fs):
     f4 = 12194.217
     A1000 = 1.9997
 
-    NUMs = [(2*np.pi * f4)**2 * (10**(A1000/20)), 0, 0, 0, 0]
-    DENs = np.polymul([1, 4*np.pi * f4, (2*np.pi * f4)**2],
-                   [1, 4*np.pi * f1, (2*np.pi * f1)**2])
-    DENs = np.polymul(np.polymul(DENs, [1, 2*np.pi * f3]),
-                                 [1, 2*np.pi * f2])
+    NUMs = [(2 * np.pi * f4) ** 2 * (10 ** (A1000 / 20)), 0, 0, 0, 0]
+    DENs = np.polymul([1, 4 * np.pi * f4, (2 * np.pi * f4) ** 2],
+                      [1, 4 * np.pi * f1, (2 * np.pi * f1) ** 2])
+    DENs = np.polymul(np.polymul(DENs, [1, 2 * np.pi * f3]),
+                                       [1, 2 * np.pi * f2])
 
     return scipy.signal.bilinear(NUMs, DENs, fs)
 
@@ -302,8 +302,8 @@ class Meter:
 
             def plot_line(samples, colour):
                 lp = None
-                for x, y in enumerate(samples):
-                    xp = x * dx + rect.x
+                for x, y in enumerate(samples[::-1]):
+                    xp = rect.w - x * dx + rect.x
                     yp = y * dy + rect.y
                     xp, yp = int(xp), int(yp)
 

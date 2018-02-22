@@ -32,10 +32,9 @@ That said, there are a few dependencies required:
 - PyAudio
 
 Once python has been installed, all of the other dependancies can be installed
-using the command line tool `pip` by doing `python3 -m pip install --user pygame
-numpy scipy pyaudio`.
-This has been primerally been designed to run on a Raspberry Pi using a TFT
-screen, and for that, there is a little more to do:
+using the command line tool `pip` by doing `python3 -m pip install -r
+requirements.txt`. This has been primerally been designed to run on a Raspberry
+Pi using a TFT screen, and for that, there is a little more to do:
 
 - First, setup a Raspberry Pi following the instructions
   [here](https://www.raspberrypi.org/learning/software-guide/quickstart/).
@@ -43,16 +42,23 @@ screen, and for that, there is a little more to do:
   `Ctrl+Alt+F3`.
 - Login with the username `pi` and the password `raspberry`.
 - Issue the command `sudo apt install git`.
+- Issue the command `git clone https://github.com/Bottersnike/spl_pygame meter`.
+- At this point, you can either execute `cd meter && sudo ./quickstart.sh` or
+  you can continue to follow these steps.
 - Issue the command `wget https://bootstrap.pypa.io/get-pip.py`.
 - Issue the command `sudo python3 get_pip.py`.
-- Issue the command `sudo python3 -m pip install pygame numpy scipy pyaudio`.
-- Issue the command `git clone https://github.com/Bottersnike/spl_pygame meter`.
+- Issue the command `cd meter && sudo python3 -m pip install -r
+  requirements.txt`.
 - Use `sudo raspi-config` to set the `pi` user to automatically log in and
   enable SSH. **Make sure to enable SSH. This will be the only way to
   re-configure the Pi or install updates once you've finished.** If your Pi
   booted to the desktop, this is also the place to dissable that as we don't
   want it to do that.
 - Issue the command `sudo reboot`.
+- If you want to configure the meter, use `nano meter/config.py` before
+  following the other steps. As there is no way to quite the meter when it is
+  running in full screen, either run `startx` and open a terminal or configure
+  it on a different computer then copy across the `config.py` file.
 - Finally, run `nano .bashrc` and add `cd meter && while true; do python3
   main.py; done` on a new line at the end.
 
@@ -67,6 +73,22 @@ connect to your Pi then use a tool such as `nmap` to locate its IP address then
 you can follow step 4
 [here](https://www.raspberrypi.org/documentation/remote-access/ssh/README.md) to
 gain access to it.
+
+## Configuring the audio input
+The meter allows for either one or two audio inputs to be monitored at once. The
+secondary input is dissabled by default, but can be enabled by setting `LINE_IN`
+to `True` in `config.py`. `DEVICE_1_ID` and `DEVICE_2_ID` will probably then
+need to be set to the IDs of your audio device(s). They could be anything from
+an electret mic to a USB soundcard with an audio input, the script doesn't care.
+`CHANNELS` and `RATE` will then need to be set to match your device. The number
+of channels has been test up to 32 channels, but it theoretically should be able
+to handle more. The sampling rate must be set to the correct value otherwise the
+script will fail to start. Use the command `aplay -L` (on linux) to determine
+the device IDs for your inputs.
+
+Due to limitations in how it has been designed, the same sampling frequency must
+be used for both devies and the same for the number of channels. This is
+something that I hope to ammend in the future, though.
 
 ## Operational modes
 
