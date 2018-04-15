@@ -4,9 +4,7 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-wget https://bootstrap.pypa.io/get-pip.py
-python3 get_pip.py
-rm get_pip.py
+curl https://bootstrap.pypa.io/get-pip.py | python3
 python3 -m pip install -r requirements.txt
 echo "cd meter && while true; do python3 main.py; done" >> ~/.bashrc
 
@@ -15,7 +13,7 @@ echo "Installation has finished. raspi-config will now open."
 echo "Please enable SSH and Auto-Login for the `pi` user."
 read -p "Press return to continue.. "
 
-raspi-confi
+raspi-config
 
 echo "You should now be fully configured. Please take this time to edit"
 echo "config.py before running `sudo reboot` as this machine is now setup"
