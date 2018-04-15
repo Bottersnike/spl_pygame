@@ -8,6 +8,7 @@ DEFAULT_CONFIG = 'meter/config/.default_config.yml'
 
 
 def load_config():
+    """Load the config or create it if it doesn't exist."""
     new = False
     if not os.path.exists(CONFIG_PATH):
         with open(DEFAULT_CONFIG) as file1:

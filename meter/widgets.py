@@ -13,6 +13,7 @@ FONT_BIG = pygame.font.Font('meter/assets/font.ttf', CONFIG.get('big_font_size',
 
 
 class Button(Pane):
+    """A simple widget providing a button that can be inactive, active or disabled."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -51,6 +52,7 @@ class Button(Pane):
 
 
 class Indicator(Pane):
+    """A widget that provides a block of colour with a label to represent something."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label = kwargs.get('label', '')
@@ -69,6 +71,10 @@ class Indicator(Pane):
 
 
 class Graph(Pane):
+    """A widget that renders a graph with two lines plotted.
+
+    `meth`:feed is also provided to feed in data and the buffer will be
+    control by this class."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.data_sets = [[], []]
@@ -100,6 +106,7 @@ class Graph(Pane):
 
 
 class VUMeter(Pane):
+    """A widget that provides two "VU" meters side-by-side."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -189,6 +196,10 @@ class VUMeter(Pane):
 
 
 class MessageBox(Pane):
+    """A widget that renders a block of text until dismissed. Intended to be
+    added on its own to a manager instead of within a grid.
+    """
+
     CLOSE_MSG = 'Tap anywhere to close.'
 
     def __init__(self, message, *args, **kwargs):

@@ -2,6 +2,12 @@ import pygame
 
 
 class Font:
+    """A cached font render.
+
+    As soon as any font is loaded or a render generated, the resultant object
+    will be added to the cache and used instead next time.
+    """
+
     def __init__(self, filename):
         self._filename = filename
         self._font_cache = {}
