@@ -1,24 +1,45 @@
 import pygame
 
+import os
+
 
 class Font:
-    """A cached font render.
-
-    As soon as any font is loaded or a render generated, the resultant object
-    will be added to the cache and used instead next time.
     """
-
+    Provides a caching wrapper around pygame.font.Font.
+    Usually speeds up rendering significantly by rendering once then just
+    retrieving from RAM on future render calls.
+    """
     def __init__(self, filename):
-        self._filename = filename
-        self._font_cache = {}
-        self._render_cache = {}
+        self._cache = {}
+        self._fonts = {}
 
-    def render(self, size, text, colour, italic=False):
+        self.filename = os.path.join(os.path.dirname(__file__), filename)
+
+    def _get_font(self, size):
+        if size in self._fonts:
+            return self._fonts[size]
+
+        font = pygame.font.Font(self.filename, size)
+        self._fonts[size] = font
+
+        return font
+
+    def render(self, text, colour, size):
         colour = tuple(colour)
-        if (size, text, colour) not in self._render_cache:
-            if size not in self._font_cache:
-                self._font_cache[(size, italic)] = pygame.font.Font(self._filename, size)
-                if italic:
-                    self._font_cache[(size, italic)].set_italic(True)
-            self._render_cache[(size, text, colour)] = self._font_cache[(size, italic)].render(text, 1, colour)
-        return self._render_cache[(size, text, colour)]
+
+        if (text, colour, size) in self._cache:
+            return self._cache[text, colour, size]
+
+        text = self._get_font(size).render(text, 1, colour)
+        self._cache[text, colour, size] = text
+
+        return text
+
+    def get_ascent(self, size):
+        return self._get_font(size).get_ascent()
+
+    def get_descent(self, size):
+        return self._get_font(size).get_descent()
+
+    def get_height(self, size):
+        return self._get_font(size).get_height()

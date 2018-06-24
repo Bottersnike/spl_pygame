@@ -73,11 +73,22 @@ button_blue_colour: [          # The colour palette for an active button
 ]
 
 big_font_size: 20              # The font size for buttons and panel labels
+mid_font_size: 15              # The font size for smaller text
 font_size: 10                  # The font size for the "UV" meter labels
 
 fps: 30                        # The FPS to refresh the display at
 
 colour_padding: 4              # The internal padding around coloured regions
 padding: 0.5                   # The padding between panes
+
+welcome_message: |             # The message to display on startup
+        Thanks for using my code!
+        Any feedback would be greatly
+        appreciated.
+
+        For help and info, please see
+        https://bsnk.me/spl
+
+        (Use config.yml to replace this)
 
 watermark: True                # Toggle the mark in the bottom right

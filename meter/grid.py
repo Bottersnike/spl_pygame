@@ -20,7 +20,11 @@ class Manager:
 
     def remove(self, child):
         if child in self._children:
-            del self._children[child]
+            if isinstance(self._children, dict):
+                del self._children[child]
+            elif hasattr(self._children, "remove"):
+                # For root-level managers, _children might be a list
+                self._children.remove(child)
 
     def request_position(self, child):
         return 0, 0
@@ -71,6 +75,10 @@ class Manager:
         for child in list(self._children.keys()):
             child.tick()
 
+    @property
+    def children(self):
+        return len(self._children)
+
 
 class Gridable:
     """This  class represents any object that can be a child of a manager."""
@@ -96,6 +104,12 @@ class Gridable:
 
     def tick(self):
         pass
+
+    def destroy(self):
+        self.parent.remove(self)
+        if isinstance(self.parent, Manager):
+            if self.parent.children == 0:
+                self.parent.destroy()
 
 
 class Pane(Gridable):
@@ -199,6 +213,10 @@ class SingleManager(Manager):
     This is a wrapper manager that only contains one child. This is used by the
     root window when a widget is parented to it.
     """
+    def __init__(self):
+        super().__init__()
+        self.parent = None
+
     def set_c(self, child):
         """Add a new child into the griding system."""
         assert isinstance(child, Gridable)
@@ -218,6 +236,12 @@ class SingleManager(Manager):
     def remove_child(self, _):
         self.parent.remove_child(self)
         del self
+
+    def destroy(self):
+        self.parent.remove(self)
+        if isinstance(self.parent, Manager):
+            if self.parent.children == 0:
+                self.parent.destroy()
 
 
 class RootWindow(Manager):

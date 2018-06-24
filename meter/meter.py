@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import threading
 import struct
 import math
@@ -11,12 +9,11 @@ import pyaudio
 import pygame
 
 from .config import load_config
-CONFIG, NEW_CONFIG = load_config()
 from .widgets import Button, Indicator, Graph, VUMeter, MessageBox
 from .grid import GridingManager, RootWindow
 from .enums import *
 
-
+CONFIG, NEW_CONFIG = load_config()
 if CONFIG.get('rpi'):
     # When using the TFT screen on the Raspberry Pi, SDL still expects a
     # standard screen so we force it to connect to a seperate frame-buffer/
@@ -25,7 +22,8 @@ if CONFIG.get('rpi'):
     os.environ['SDL_FBDEV'] = '/dev/fb1'
     os.environ['SDL_MOUSEDRV'] = 'TSLIB'
     os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
-pygame.init()
+pygame.display.init()
+pygame.font.init()
 
 
 AW_BTN = 0
@@ -38,7 +36,6 @@ The default has been loaded.
 
 You should probably close this
 and setup the audio inputs."""
-
 
 
 def a_weighting(fs):
@@ -128,6 +125,8 @@ class Meter:
 
         self.root.add_child(self.box)
 
+        if CONFIG['welcome_message']:
+            self.root.add_child(MessageBox(CONFIG['welcome_message']))
         if NEW_CONFIG:
             self.root.add_child(MessageBox(CONFIG_MESSAGE))
 
@@ -292,6 +291,8 @@ class Meter:
     def main(self):
         """Hand over to the GUI manager"""
         self.root.mainloop()
+        pygame.display.quit()
+        pygame.font.quit()
 
 
 if __name__ == '__main__':

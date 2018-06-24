@@ -2,7 +2,6 @@ import os
 
 import ruamel.yaml as yaml
 
-
 CONFIG_PATH = 'meter/config/config.yml'
 DEFAULT_CONFIG = 'meter/config/.default_config.yml'
 
@@ -16,8 +15,15 @@ def load_config():
                 file2.write(file1.read())
         new = True
 
-    with open(CONFIG_PATH) as f:
-        config = yaml.safe_load(f)
+    with open(DEFAULT_CONFIG) as file_:
+        default_config = yaml.safe_load(file_)
+    with open(CONFIG_PATH) as file_:
+        config = yaml.safe_load(file_)
+
+    # Restore omitted values from config
+    for key in default_config:
+        if key not in config:
+            config[key] = default_config[key]
 
     return config, new
 
