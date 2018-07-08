@@ -119,6 +119,22 @@ configured in `config.py` (200 samples by default).
 
 ![Graph and speech modes][graph-split]
 
+## Using a local loopback
+
+As well as using a hardware input device, a software output can also be
+configured in just the same manner by creating a sink and routing audio
+through it. An example can be seen below where desktop audio is first
+passed through Ardour from three different hardware and software sources
+to process it, then it outputs to both the hardware out and the sink that was
+created. This is the setup that was used to produce the other screenshots seen
+on this page, as it is more convenient for testing. Most sound drivers will
+provide functionality for a sink, however in the case that a driver does not,
+a physical loopback can be used by taking an output and just feeding it back
+through a soundcard or similar device.
+
+![JACKd configured with a pulse sink][jackd]
+
 [all]: https://github.com/Bottersnike/spl_pygame/raw/master/img/all.png
 [aw-speech]: https://github.com/Bottersnike/spl_pygame/raw/master/img/aw_speech.png
 [graph-split]: https://github.com/Bottersnike/spl_pygame/raw/master/img/graph_split.png
+[jackd]: https://github.com/Bottersnike/spl_pygame/raw/master/img/jackd.png
