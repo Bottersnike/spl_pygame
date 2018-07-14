@@ -1,5 +1,7 @@
 # Sound Level Meter using Python
 
+For the 3D models, please see ![bsnk.me/spl](https://bsnk.me/spl).
+
 ![All modes enabled][all]
 
 ## What _is_ this?
